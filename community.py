@@ -9,8 +9,9 @@ class Community:
             self.__content = load(f)
 
     def add_post(self, title: str, continue_link: str) -> str:
-        self.__content[self.gen_link_and_id()[0]] = [title, self.gen_link_and_id()[1], continue_link]
-        return title
+        id_link = self.gen_link_and_id()[1]
+        self.__content[self.gen_link_and_id()[0]] = [title, id_link, continue_link]
+        return id_link
 
     def gen_link_and_id(self) -> list:
         list_chars = list()
@@ -34,12 +35,9 @@ class Community:
         except KeyError as ex:
             return f"Не правильный id поста: {ex}"
 
-    def get_post_link(self, id_: str, type_: str) -> str:
+    def get_post_link(self, id_: str) -> str:
         if self.check_content():
-            if type_ == "id":
-                return self.__content[id_][1]
-            else:
-                return self.__content[id_][2]
+            return self.__content[id_][2]
         else:
             return "Список постов пуст"
 
