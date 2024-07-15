@@ -8,8 +8,9 @@ class Community:
         with open(json_file) as f:
             self.__content = load(f)
 
-    def add_post(self, title: str, continue_link: str):
+    def add_post(self, title: str, continue_link: str) -> str:
         self.__content[self.gen_link_and_id()[0]] = [title, self.gen_link_and_id()[1], continue_link]
+        return title
 
     def gen_link_and_id(self) -> list:
         list_chars = list()
@@ -25,25 +26,40 @@ class Community:
 
     def delete_post(self, id_: str) -> str:
         try:
-            self.__content.pop(id_)
-            return id_
+            if self.check_content():
+                self.__content.pop(id_)
+                return id_
+            else:
+                return "Список постов пуст"
         except KeyError as ex:
             return f"Не правильный id поста: {ex}"
 
     def get_post_link(self, id_: str, type_: str) -> str:
-        if type_ == "id":
-            return self.__content[id_][1]
+        if self.check_content():
+            if type_ == "id":
+                return self.__content[id_][1]
+            else:
+                return self.__content[id_][2]
         else:
-            return self.__content[id_][2]
+            return "Список постов пуст"
 
     def get_list_posts(self) -> str:
-        str_list = ""
-        for i, k in self.__content.items():
-            if i == "id_list":
-                break
-            str_list += f"{i}: {k[0]} | {k[1]} | {k[2]}\n"
+        if self.check_content():
+            str_list = ""
+            for i, k in self.__content.items():
+                if i == "id_list":
+                    break
+                str_list += f"{i}: {k[0]} | {k[1]} | {k[2]}\n"
 
-        return str_list
+            return str_list
+        else:
+            return "Список постов пуст"
+
+    def check_content(self):
+        if len(self.__content) >= 2:
+            return True
+        else:
+            return False
 
     def save_to_json(self):
         with open('posts.json', 'w') as f:
