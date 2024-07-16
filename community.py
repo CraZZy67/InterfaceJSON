@@ -3,6 +3,8 @@ from json import load, dump
 from random import shuffle
 from typing import Union
 
+from loggers import main_logger
+
 
 class Community:
     def __init__(self, json_file: Union[str, dict]):
@@ -16,7 +18,8 @@ class Community:
         id_and_link = self.gen_link_and_id()
 
         self.__content[id_and_link[0]] = [title, id_and_link[1], continue_link]
-        return id_and_link[0]
+        main_logger.info(f"Добавлен пост, id: {id_and_link[0]}")
+        return id_and_link[1]
 
     def gen_link_and_id(self) -> list:
         list_chars = list()
@@ -34,14 +37,20 @@ class Community:
         try:
             if self.check_content():
                 self.__content.pop(id_)
+                self.__content["id_list"].remove(id_)
+
+                main_logger.info(f"Удален пост id: {id_}")
                 return id_
             else:
                 return "Список постов пуст"
+
         except KeyError as ex:
+            main_logger.exception(f"Не правильный id поста: {ex}")
             return f"Не правильный id поста: {ex}"
 
     def get_post_link(self, id_: str) -> str:
         if self.check_content():
+            main_logger.info(f"Возвращена индивидуальная ссылка поста: {self.__content[id_][2]}")
             return self.__content[id_][2]
         else:
             return "Список постов пуст"
@@ -51,9 +60,10 @@ class Community:
             str_list = ""
             for i, k in self.__content.items():
                 if i == "id_list":
-                    break
+                    continue
                 str_list += f"{i}: {k[0]} | {k[1]} | {k[2]}\n"
 
+            main_logger.info(f"Возвращен список всех постов: {str_list[0:30]}")
             return str_list
         else:
             return "Список постов пуст"
@@ -67,3 +77,4 @@ class Community:
     def save_to_json(self):
         with open('posts.json', 'w') as f:
             dump(self.__content, f, indent=4)
+            main_logger.info("Информация сохранена в json")
