@@ -1,17 +1,22 @@
 from string import ascii_letters, digits
 from json import load, dump
 from random import shuffle
+from typing import Union
 
 
 class Community:
-    def __init__(self, json_file: str):
-        with open(json_file) as f:
-            self.__content = load(f)
+    def __init__(self, json_file: Union[str, dict]):
+        if isinstance(json_file, str):
+            with open(json_file) as f:
+                self.__content = load(f)
+        else:
+            self.__content = json_file
 
     def add_post(self, title: str, continue_link: str) -> str:
-        id_link = self.gen_link_and_id()[1]
-        self.__content[self.gen_link_and_id()[0]] = [title, id_link, continue_link]
-        return id_link
+        id_and_link = self.gen_link_and_id()
+
+        self.__content[id_and_link[0]] = [title, id_and_link[1], continue_link]
+        return id_and_link[0]
 
     def gen_link_and_id(self) -> list:
         list_chars = list()
